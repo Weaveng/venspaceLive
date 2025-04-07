@@ -83,7 +83,7 @@ export default function Home() {
           >
             <div className="pointer-events-auto flex flex-col gap-6">
               <div className="flex flex-col gap-0.5">
-                <h2 className="text-[#333333] md:text-[28px] text-xl font-bold">
+                <h2 className="text-[#333333] md:text-[28px] text-xl font-bold tracking-[1px]">
                   Get early access to{" "}
                   <span className="text-[#F44363]">Venspace</span>
                 </h2>
@@ -120,7 +120,7 @@ export default function Home() {
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
+                        <FormLabel className="text-sm text-[#5C5C5C] font-medium">Phone Number</FormLabel>
                         <FormControl>
                           <Input
                             inputMode="tel"
