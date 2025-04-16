@@ -2,7 +2,13 @@
 
 import { Hero } from "@/components/hero";
 import { useState } from "react";
-import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogOverlay,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -58,20 +64,33 @@ export default function Home() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-    setShowSuccess(true);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
+    setShowSuccess(false);
 
-      // Reset the form to default values
-  form.reset({
-    email: "",
-    phone: "",
-    description: "Select",
-  });
+    try {
+      const response = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) throw new Error("Something went wrong");
+
+      const result = await response.json();
+      console.log("Zoho response:", result);
+
+      setShowSuccess(true);
+      form.reset();
+    } catch (error) {
+      console.error("Error submitting to Zoho:", error);
+    } finally {
+      setLoading(false);
+    }
   }
+
   return (
     <main>
       <Dialog open={true}>
@@ -81,6 +100,9 @@ export default function Home() {
             onInteractOutside={(e) => e.preventDefault()} // Prevents outside clicks
             onEscapeKeyDown={(e) => e.preventDefault()} // Prevents ESC key
           >
+            <VisuallyHidden>
+              <DialogTitle>My Hidden Dialog Title</DialogTitle>
+            </VisuallyHidden>
             <div className="pointer-events-auto flex flex-col gap-6">
               <div className="flex flex-col gap-0.5">
                 <h2 className="text-[#333333] md:text-[28px] text-xl font-bold tracking-[1px]">
@@ -120,7 +142,9 @@ export default function Home() {
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm text-[#5C5C5C] font-medium">Phone Number</FormLabel>
+                        <FormLabel className="text-sm text-[#5C5C5C] font-medium">
+                          Phone Number
+                        </FormLabel>
                         <FormControl>
                           <Input
                             inputMode="tel"
