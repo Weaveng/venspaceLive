@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
-const CLIENT_ID = "1000.ZRZB7LLDOS0KUBX2CRA68IOEXU0T6O";
-const CLIENT_SECRET = "666b8183c6a6562f7d9ad81ffa0aaa185046b85309";
-const LIST_KEY = "3zd4a725ceef889a6c59f182164a0dd0288fc5f2396370618d3e0bcef414e22714";
+const CLIENT_ID = `${process.env.NEXT_PUBLIC_CLIENT_ID}`;
+const CLIENT_SECRET = `${process.env.NEXT_PUBLIC_CLIENT_SECRET}`;
+const LIST_KEY = `${process.env.NEXT_PUBLIC_LIST_KEY}`;
 
 export async function POST(req: Request) {
   try {
@@ -49,6 +49,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, data: subscribeData });
   } catch (err) {
     console.error("Zoho error:", err);
-    return NextResponse.json({ success: false, error: "Zoho integration failed" }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: "Zoho integration failed" },
+      { status: 500 }
+    );
   }
 }
