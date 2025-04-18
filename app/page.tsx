@@ -49,6 +49,7 @@ const formSchema = z.object({
   description: z
     .string()
     .min(1, { message: "Please select what best describes you" }),
+  testerProgram: z.boolean(),
 });
 
 export default function Home() {
@@ -61,31 +62,47 @@ export default function Home() {
       email: "",
       phone: "",
       description: "",
+      testerProgram: false,
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
-    setShowSuccess(false);
-
     try {
-      const response = await fetch("/api/subscribe", {
+      setLoading(true);
+
+      const apiValues = {
+        ...values,
+        testerProgram: values.testerProgram ? "Yes" : "No"
+      };
+      
+
+      const response = await fetch("/api/sheets", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify(apiValues),
       });
 
-      if (!response.ok) throw new Error("Something went wrong");
+      if (!response.ok) {
+        throw new Error("Failed to submit to Google Sheets");
+      }
 
-      const result = await response.json();
-      console.log("Zoho response:", result);
-
+      console.log("Successfully subscribed:", values);
       setShowSuccess(true);
-      form.reset();
-    } catch (error) {
-      console.error("Error submitting to Zoho:", error);
+      setTimeout(() => {
+        setShowSuccess(false)
+      }, 3000);
+
+      // Reset form
+      form.reset({
+        email: "",
+        phone: "",
+        description: "",
+      });
+    } catch (error: any) {
+      console.error("Subscription error:", error);
+      alert(`Subscription failed: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -198,6 +215,26 @@ export default function Home() {
                           </Select>
                         </FormControl>
                         <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="testerProgram"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                        <FormControl>
+                          <input
+                            type="checkbox"
+                            checked={field.value}
+                            onChange={(e) => field.onChange(e.target.checked)}
+                            className="h-4 w-4 rounded border-gray-300 text-[#F44363] focus:ring-[#F44363]"
+                          />
+                        </FormControl>
+                        <FormLabel className="text-sm text-[#5C5C5C] font-normal">
+                          I'd like to be part of your testers program and
+                          provide feedback
+                        </FormLabel>
                       </FormItem>
                     )}
                   />
