@@ -92,7 +92,7 @@ export default function Home() {
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false)
-      }, 3000);
+      }, 5000);
 
       // Reset form
       form.reset({
@@ -232,7 +232,7 @@ export default function Home() {
                           />
                         </FormControl>
                         <FormLabel className="text-sm text-[#5C5C5C] font-normal">
-                          I'd like to be part of your testers program and
+                          I&apos;d like to be part of your testers program and
                           provide feedback
                         </FormLabel>
                       </FormItem>
