@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Instrument_Sans } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "sonner";
 
 
 const instrumentalSans = Instrument_Sans({ subsets: ["latin"] });
@@ -20,6 +21,7 @@ export default function RootLayout({
       <body
         className={`${instrumentalSans.className}`}
       >
+        <Toaster position="top-center" richColors />
         {children}
       </body>
     </html>

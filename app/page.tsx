@@ -2,6 +2,8 @@
 
 import { Hero } from "@/components/hero";
 import { useState } from "react";
+import { toast } from "sonner";
+
 import {
   Dialog,
   DialogContent,
@@ -34,6 +36,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import Image from "next/image";
+import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -66,15 +69,107 @@ export default function Home() {
     },
   });
 
+  // async function onSubmit(values: z.infer<typeof formSchema>) {
+  //   try {
+  //     setLoading(true);
+
+  //     const apiValues = {
+  //       ...values,
+  //       testerProgram: values.testerProgram ? "Yes" : "No"
+  //     };
+
+  //     const response = await fetch("/api/sheets", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(apiValues),
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error("Failed to submit to Google Sheets");
+  //     }
+
+  //     console.log("Successfully subscribed:", values);
+  //     setShowSuccess(true);
+  //     setTimeout(() => {
+  //       setShowSuccess(false)
+  //     }, 5000);
+
+  //     // Reset form
+  //     form.reset({
+  //       email: "",
+  //       phone: "",
+  //       description: "",
+  //     });
+  //   } catch (error: any) {
+  //     console.error("Subscription error:", error);
+  //     alert(`Subscription failed: ${error.message}`);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
+
+  // async function onSubmit(values: z.infer<typeof formSchema>) {
+  //   try {
+  //     setLoading(true);
+
+  //     const apiValues = {
+  //       ...values,
+  //       testerProgram: values.testerProgram ? "Yes" : "No"
+  //     };
+
+  //     const response = await fetch("/api/sheets", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(apiValues),
+  //     });
+
+  //     const data = await response.json(); // Parse the JSON response
+
+  //     if (!response.ok) {
+  //       // Handle the case where email or phone exists
+  //       if (data.error === "Entry already exists") {
+  //         throw new Error(
+  //           data.details.emailExists
+  //             ? "This email is already registered"
+  //             : "This phone number is already registered"
+  //         );
+  //       }
+  //       throw new Error(data.error || "Failed to submit to Google Sheets");
+  //     }
+
+  //     console.log("Successfully subscribed:", values);
+  //     setShowSuccess(true);
+  //     setTimeout(() => {
+  //       setShowSuccess(false)
+  //     }, 5000);
+
+  //     // Reset form
+  //     form.reset({
+  //       email: "",
+  //       phone: "",
+  //       description: "",
+  //     });
+  //   } catch (error: any) {
+  //     console.error("Subscription error:", error);
+  //     toast(error.message); // Set the error state
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setLoading(true);
+      toast.dismiss(); // Clear any existing toasts
 
       const apiValues = {
         ...values,
-        testerProgram: values.testerProgram ? "Yes" : "No"
+        testerProgram: values.testerProgram ? "Yes" : "No",
       };
-      
 
       const response = await fetch("/api/sheets", {
         method: "POST",
@@ -84,14 +179,23 @@ export default function Home() {
         body: JSON.stringify(apiValues),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to submit to Google Sheets");
+        if (data.error === "Entry already exists") {
+          // Show specific error toast for duplicate entries
+          toast.error(data.details.message, {
+            duration: 5000,
+            position: "top-center",
+          });
+          return; // Exit early
+        }
+        throw new Error(data.error || "Failed to submit to Google Sheets");
       }
 
-      console.log("Successfully subscribed:", values);
       setShowSuccess(true);
       setTimeout(() => {
-        setShowSuccess(false)
+        setShowSuccess(false);
       }, 5000);
 
       // Reset form
@@ -99,10 +203,15 @@ export default function Home() {
         email: "",
         phone: "",
         description: "",
+        testerProgram: false,
       });
     } catch (error: any) {
       console.error("Subscription error:", error);
-      alert(`Subscription failed: ${error.message}`);
+      // Show generic error toast
+      toast.error(error.message || "An unexpected error occurred", {
+        duration: 5000,
+        position: "top-center",
+      });
     } finally {
       setLoading(false);
     }
@@ -244,6 +353,7 @@ export default function Home() {
                     disabled={loading}
                   >
                     Unlock the Experience
+                    {loading && <Loader2 size={5} className="animate-spin" />}
                   </Button>
                 </form>
               </Form>

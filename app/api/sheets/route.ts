@@ -16,20 +16,53 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { email, phone, description, testerProgram } = body;
 
-    const response = await sheets.spreadsheets.values.append({
+    // First, get all existing values from the sheet
+    const readResponse = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
-      range: "Sheet1!A:C",
+      range: "Sheet1!A:D", // Assuming columns A (email), B (phone), C (description), D (testerProgram)
+    });
+
+    const existingValues = readResponse.data.values || [];
+
+    // Check if email or phone already exists
+    const emailExists = existingValues.some(row => row[0] === email);
+    const phoneExists = existingValues.some(row => row[1] === phone);
+
+    if (emailExists || phoneExists) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: "Entry already exists",
+          details: {
+            emailExists,
+            phoneExists,
+            message: emailExists 
+            ? "This email is already registered" 
+            : "This phone number is already registered"
+          }
+        }, 
+        { status: 400 }
+      );
+    }
+
+    // If email and phone don't exist, append the new row
+    const appendResponse = await sheets.spreadsheets.values.append({
+      spreadsheetId: process.env.GOOGLE_SHEET_ID,
+      range: "Sheet1!A:D",
       valueInputOption: "USER_ENTERED",
       requestBody: {
         values: [[email, phone, description, testerProgram]],
       },
     });
 
-    return NextResponse.json({ success: true, data: response.data });
+    return NextResponse.json({ 
+      success: true, 
+      data: appendResponse.data 
+    });
   } catch (error) {
-    console.error("Error adding to sheet:", error);
+    console.error("Error processing sheet data:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to add to sheet" },
+      { success: false, error: "Failed to process sheet data" },
       { status: 500 }
     );
   }
