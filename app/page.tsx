@@ -36,7 +36,9 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import Image from "next/image";
-import { Loader2 } from "lucide-react";
+import { Instagram, Linkedin, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { Explore } from "@/components/explore";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -365,12 +367,39 @@ export default function Home() {
                   </p>
                 </div>
               )}
+              <div className="flex justify-center items-center gap-6">
+                <Link href="https://instagram.com/venspaceco" target="_blank">
+                  <div className="flex justify-center items-center border border-[#F44363] size-8 p-2 rounded-full">
+                    <Instagram size={24} color="#F44363" />
+                  </div>
+                </Link>
+                <Link
+                  href="https://www.linkedin.com/company/venspacehq/"
+                  target="_blank"
+                >
+                  <div className="flex justify-center items-center border border-[#F44363] size-8 p-2 rounded-full">
+                    <Linkedin size={24} color="#F44363" />
+                  </div>
+                </Link>
+              </div>
+              <div className="flex justify-center items-center">
+                <p className="text-sm text-[#5C5C5C] font-normal">
+                  Contact:
+                  <Link
+                    href="mailto:hello@venspace.co?subject=Venspace%20waitlist"
+                    className="text-primary"
+                  >
+                    hello@venspace.co
+                  </Link>
+                </p>
+              </div>
             </div>
           </DialogContent>
         </DialogOverlay>
       </Dialog>
 
       <Hero />
+      <Explore />
     </main>
   );
 }
