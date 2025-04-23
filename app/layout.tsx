@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Instrument_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import ClientOnly from "@/components/ClientOnly";
 
 const instrumentalSans = Instrument_Sans({ subsets: ["latin"] });
 
@@ -18,6 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+       <ClientOnly>
       <head>
         {/* Google Tag Manager */}
         <script>{`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -39,6 +41,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <Toaster position="top-center" richColors />
         {children}
       </body>
+      </ClientOnly>
     </html>
   );
 }
